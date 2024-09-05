@@ -1,7 +1,16 @@
 import streamlit as st
 import pandas as pd
+import altair as alt
+import plotly.express as px
 
-st.title('Site Overview - Penmanshiel Wind Farm')
+# use full width of the page
+st.set_page_config(
+    page_title="Penmanshiel Wind Farm Dashboard",
+    page_icon="🌱",
+    layout="wide",
+    initial_sidebar_state="expanded")
+
+alt.themes.enable("dark")
 
 # Load the data
 df = pd.read_parquet('data/multiple_turbine_data/all_data.parquet')
@@ -28,13 +37,16 @@ last_week = filtered_df.merge(meta_data[['Alternative Title', 'Latitude', 'Longi
 # Rename columns
 last_week.rename(columns={'Value': 'Power (kW)'}, inplace=True)
 
+map_data = last_week[['Turbine', 'Latitude', 'Longitude', 'Power (kW)']]
+map_data.reset_index(drop=True, inplace=True)
+
 # Map of the last week of data sized by Active Power
 st.map(
-    data=last_week[['Turbine', 'Latitude', 'Longitude', 'Power (kW)']],
+    data=map_data,
     latitude='Latitude',
     longitude='Longitude',
-    size='Power (kW)',
-    color='Turbine',
-    zoom=10,
+    # size='Power (kW)',
+    # color='Turbine',
+    zoom=12,
     # use_container_width=True
 )
